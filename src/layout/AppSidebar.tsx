@@ -66,6 +66,11 @@ const navItems: NavItem[] = [
     icon: <ListIcon />,
     path: "/scans"
     // subItems: [{ name: "Customers", path: "/customers" }],
+  },  {
+    name: "Scan tickets",
+    icon: <ListIcon />,
+    path: "/validate"
+    // subItems: [{ name: "Customers", path: "/customers" }],
   },
 ];
 
