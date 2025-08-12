@@ -30,48 +30,9 @@ const navItems: NavItem[] = [
   },
   {
     icon: <CalenderIcon />,
-    name: "Events",
-    path: "/events",
-  },
-  {
-    icon: <CalenderIcon />,
-    name: "*Access Points*",
+    name: "Access Points",
     path: "/access-points",
-  },
-  {
-    icon: <UserCircleIcon />,
-    name: "Staff",
-    path: "/staff",
-  },
-  {
-    name: "Customers",
-    icon: <ListIcon />,
-    path: "/customers"
-    // subItems: [{ name: "Customers", path: "/customers" }],
-  },
-  {
-    name: "Orders",
-    icon: <ListIcon />,
-    path: "/orders"
-    // subItems: [{ name: "Customers", path: "/customers" }],
-  },
-  {
-    name: "Tickets",
-    icon: <ListIcon />,
-    path: "/tickets"
-    // subItems: [{ name: "Customers", path: "/customers" }],
-  },
-  {
-    name: "Scans",
-    icon: <ListIcon />,
-    path: "/scans"
-    // subItems: [{ name: "Customers", path: "/customers" }],
-  },  {
-    name: "Scan tickets",
-    icon: <ListIcon />,
-    path: "/validate"
-    // subItems: [{ name: "Customers", path: "/customers" }],
-  },
+  }
 ];
 
 const AppSidebar: React.FC = () => {
