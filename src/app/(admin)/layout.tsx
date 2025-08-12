@@ -5,14 +5,25 @@ import AppHeader from "@/layout/AppHeader";
 import AppSidebar from "@/layout/AppSidebar";
 import Backdrop from "@/layout/Backdrop";
 import React from "react";
+import { useSession } from "next-auth/react";
+import { redirect } from 'next/navigation'
+import { ToastContainer } from 'react-toastify';
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { isExpanded, isHovered, isMobileOpen } = useSidebar();
+    const { isExpanded, isHovered, isMobileOpen } = useSidebar();
+    const { status: sessionStatus } = useSession();
 
+    if (sessionStatus === "loading") {
+      return "Loading session..."
+    }
+    if (sessionStatus === "unauthenticated") {
+      // If the user is not authenticated, redirect to the sign-in page
+      return redirect('/signin')
+    }
   // Dynamic class for main content margin based on sidebar state
   const mainContentMargin = isMobileOpen
     ? "ml-0"
@@ -31,6 +42,7 @@ export default function AdminLayout({
       >
         {/* Header */}
         <AppHeader />
+        <ToastContainer  position="bottom-right" />
         {/* Page Content */}
         <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">{children}</div>
       </div>

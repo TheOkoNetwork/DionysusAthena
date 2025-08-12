@@ -35,7 +35,7 @@ const navItems: NavItem[] = [
   },
   {
     icon: <CalenderIcon />,
-    name: "Access Points",
+    name: "*Access Points*",
     path: "/access-points",
   },
   {
@@ -65,6 +65,11 @@ const navItems: NavItem[] = [
     name: "Scans",
     icon: <ListIcon />,
     path: "/scans"
+    // subItems: [{ name: "Customers", path: "/customers" }],
+  },  {
+    name: "Scan tickets",
+    icon: <ListIcon />,
+    path: "/validate"
     // subItems: [{ name: "Customers", path: "/customers" }],
   },
 ];

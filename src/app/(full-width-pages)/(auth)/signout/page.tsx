@@ -1,6 +1,6 @@
 "use client";
 import { useEffect } from "react";
-import { signIn } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
 
 import { useConfigStore } from "@/stores/useConfigStore";
@@ -13,30 +13,10 @@ export default function SignInPage() {
     if (config) {
       console.log("Got session");
       console.log(session, status);
-      //If already signed in, redirect to home
-      if (status === "authenticated") {
-        const redirectTo = localStorage.getItem("redirectTo");
-
-        if (localStorage.getItem("redirectTo")) {
-          localStorage.removeItem("redirectTo");
-        }
-        window.location.href = redirectTo || "/";
-
-        return;
-      }
-      if (config?.staff_identity_store_id) {
-        signIn(
-          "zitadel",
-          {},
-          {
-            scope: `openid email profile offline_access urn:zitadel:iam:org:id:${config.staff_identity_store_id}`,
-          },
-        );
-      } else {
-        console.error(
-          "Staff identity store ID is not available in the config.",
-        );
-      }
+      signOut().then(() => {
+        console.log("Signed out successfully");
+        window.location.href = `/api/single-signout?cb=${Date.now()}`;
+      });
     }
   }, [config, session,status]);
 
@@ -46,7 +26,7 @@ export default function SignInPage() {
         <div>
           <div className="mb-5 sm:mb-8">
             <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
-              Signing in
+              Signing out
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Just a moment
