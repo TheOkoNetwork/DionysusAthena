@@ -41,7 +41,7 @@ export const authOptions: NextAuthOptions = {
     secret: process.env.NEXTAUTH_SECRET,
     callbacks: {
         jwt: async ({ token, user, account }) => { // These parameters are typed by NextAuthOptions
-            console.log("JWT Callback:", { token, user, account });
+            // console.log("JWT Callback:", { token, user, account });
             // Store access_token directly on token
             if (account?.access_token) {
                 token.access_token = account.access_token;
@@ -56,7 +56,7 @@ export const authOptions: NextAuthOptions = {
             return token;
         },
         session({ session, token, user }: { session: Session; token: JWT, user: User }) {
-            console.log("Session Callback:", { session, token, user });
+            // console.log("Session Callback:", { session, token, user });
             // Copy access_token from token to session
             session.accessToken = token.access_token;
             if (token.sub) {
@@ -84,8 +84,8 @@ export const authOptions: NextAuthOptions = {
             },
             profile(profile: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
                 // Log essential information when a user logs in
-                console.log("User logged in", { userId: profile.sub });
-                console.log(profile);
+                // console.log("User logged in", { userId: profile.sub });
+                // console.log(profile);
 
                 return {
                     id: profile.sub, // User ID from the profile

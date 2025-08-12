@@ -17,7 +17,7 @@ export default function BarcodeScannerComponent() {
   const [data, setData] = useState("Not Found");
 
   const [facingMode, setFacingMode] = useState<"environment" | "user">("environment");
-  const [torchActive, setTorchActive] = useState<boolean>(false);
+  // const [torchActive, setTorchActive] = useState<boolean>(false);
   const [scannerActive, setScannerActive] = useState<boolean>(true);
 
 
@@ -31,9 +31,9 @@ export default function BarcodeScannerComponent() {
   const toggleFacingMode = () => {
     setFacingMode(facingMode === "environment" ? "user" : "environment");
   };
-  const toggleTorchActive = () => {
-    setTorchActive(!torchActive);
-  };
+  // const toggleTorchActive = () => {
+  //   setTorchActive(!torchActive);
+  // };
 
   if (!scannerActive) {
     return "Scanner not active."

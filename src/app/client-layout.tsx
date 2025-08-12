@@ -10,6 +10,7 @@ export default function ClientLayout({
 }) {
   return (
     <SessionProvider>
+
       <SidebarProvider>{children}</SidebarProvider>
     </SessionProvider>
   );

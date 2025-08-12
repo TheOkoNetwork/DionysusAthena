@@ -7,8 +7,10 @@ interface AccessPoint {
   id: string;
   name: string;
 }
-
-export async function GET(): Promise<Response> {
+interface Params {
+  accessPointId: string;
+}
+export async function GET(request: Request, { params }: { params: Params }): Promise<Response> {
   const session = await getServerSession(authOptions);
 
   console.log("Session:", session);
@@ -20,12 +22,12 @@ export async function GET(): Promise<Response> {
     throw new Error("OLYMPUS_URL environment variable is not defined");
   }
   try {
-    const query = `query qryAccessPoints {
-            accessPoints {
-                id
-                name
-            }
-        }`;
+    const query = `query qryAccessPoint($accessPointId: String!) {
+  accessPoint(id: $accessPointId) {
+    id
+    name
+  }
+}`;
 
     const response = await fetch(process.env.OLYMPUS_URL + "/graphql", {
       method: "POST",
@@ -35,7 +37,7 @@ export async function GET(): Promise<Response> {
       },
       body: JSON.stringify({
         query,
-        variables: {},
+        variables: {accessPointId: params.accessPointId},
       }),
     });
 
@@ -43,16 +45,16 @@ export async function GET(): Promise<Response> {
 
     console.log(data);
 
-    return new Response(JSON.stringify(data.data.accessPoints as AccessPoint[]), {
+    return new Response(JSON.stringify(data.data.accessPoint as AccessPoint), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error fetching list of access points:", error);
+    console.error("Error fetching access point:", error);
 
     return new Response(
       JSON.stringify({
-        error: "Failed to fetch customer access points",
+        error: "Failed to fetch access point",
       }),
       {
         status: 500,

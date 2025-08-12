@@ -21,7 +21,6 @@ export default function RootLayout({
       <script>eruda.init();</script> */}
 
         <ConfigLoader />
-        
         <ThemeProvider>
         <ClientLayout>{children}</ClientLayout>
         </ThemeProvider>

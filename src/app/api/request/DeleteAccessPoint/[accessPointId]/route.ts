@@ -1,15 +1,13 @@
 import { getServerSession } from "next-auth/next";
 import { NextResponse } from "next/server";
-
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 
-interface AccessPoint {
-  id: string;
-  name: string;
+interface Params {
+  accessPointId: string;
 }
-
-export async function GET(): Promise<Response> {
+export async function DELETE(request: Request, { params }: { params: Params }): Promise<Response> {
   const session = await getServerSession(authOptions);
+  const { accessPointId } = await params;
 
   console.log("Session:", session);
   if (!session?.accessToken) {
@@ -20,13 +18,18 @@ export async function GET(): Promise<Response> {
     throw new Error("OLYMPUS_URL environment variable is not defined");
   }
   try {
-    const query = `query qryAccessPoints {
-            accessPoints {
-                id
-                name
-            }
-        }`;
+    const query = `mutation mutDeleteAccessPoint($AccessPointId: String!) {
+  deleteAccessPoint(id: $AccessPointId) {
+    ... on deletionResult {
+      deleted
+    }
+    ... on errorResult {
+      error
+    }
+  }
+}`;
 
+    console.log(`Deleting access point ID: ${accessPointId}`)
     const response = await fetch(process.env.OLYMPUS_URL + "/graphql", {
       method: "POST",
       headers: {
@@ -35,7 +38,7 @@ export async function GET(): Promise<Response> {
       },
       body: JSON.stringify({
         query,
-        variables: {},
+        variables: { AccessPointId: accessPointId },
       }),
     });
 
@@ -43,16 +46,16 @@ export async function GET(): Promise<Response> {
 
     console.log(data);
 
-    return new Response(JSON.stringify(data.data.accessPoints as AccessPoint[]), {
+    return new Response(JSON.stringify(data.data.deleteAccessPoint), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error fetching list of access points:", error);
+    console.error("Error deleting access point:", error);
 
     return new Response(
       JSON.stringify({
-        error: "Failed to fetch customer access points",
+        error: "Failed to delete access point",
       }),
       {
         status: 500,

@@ -35,7 +35,7 @@ const navItems: NavItem[] = [
   },
   {
     icon: <CalenderIcon />,
-    name: "Access Points",
+    name: "*Access Points*",
     path: "/access-points",
   },
   {

@@ -7,6 +7,7 @@ import Backdrop from "@/layout/Backdrop";
 import React from "react";
 import { useSession } from "next-auth/react";
 import { redirect } from 'next/navigation'
+import { ToastContainer } from 'react-toastify';
 
 export default function AdminLayout({
   children,
@@ -41,6 +42,7 @@ export default function AdminLayout({
       >
         {/* Header */}
         <AppHeader />
+        <ToastContainer  position="bottom-right" />
         {/* Page Content */}
         <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">{children}</div>
       </div>

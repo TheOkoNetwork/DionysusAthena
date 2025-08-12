@@ -1,8 +1,9 @@
 'use client';
 
 import 'react-data-grid/lib/styles.css';
-import {useState, useEffect} from "react";
-import { DataGrid, type Column,SortColumn } from 'react-data-grid';
+import {useState, useEffect } from "react";
+import { useRouter } from 'next/navigation';
+import { DataGrid, type Column,SortColumn,CellMouseArgs, CellMouseEvent } from 'react-data-grid';
 
 interface Row {
   id: string;
@@ -22,6 +23,7 @@ const columns: Column<Row>[] = [
 export default function AccessPointsTable() {
   const [sortColumns, setSortColumns] = useState<readonly SortColumn[]>([]);
   const [accessPoints, setAccessPoints] = useState<AccessPoint[]>([]);
+  const router = useRouter();
   useEffect(() => {
     fetch('/api/request/GetAccessPoints')
       .then((res) => res.json())
@@ -52,7 +54,11 @@ export default function AccessPointsTable() {
     });
     setAccessPoints(newAccessPoints);
   }
+  function onCellClick(args: CellMouseArgs<Row>, event: CellMouseEvent) {
+    router.push(`/access-points/${args.row.id}`);
+  }
   return <DataGrid columns={columns} rows={accessPoints}  sortColumns={sortColumns}
   onSortColumnsChange={onSortColumnsChange}
+  onCellClick={onCellClick}
   />;
 }

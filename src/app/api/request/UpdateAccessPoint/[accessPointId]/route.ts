@@ -7,9 +7,13 @@ interface AccessPoint {
   id: string;
   name: string;
 }
-
-export async function GET(): Promise<Response> {
+interface Params {
+  accessPointId: string;
+}
+export async function POST(request: Request, { params }: { params: Params }): Promise<Response> {
   const session = await getServerSession(authOptions);
+const { accessPointId } = await params;
+  const { name: AccessPointName } = await request.json()
 
   console.log("Session:", session);
   if (!session?.accessToken) {
@@ -20,13 +24,19 @@ export async function GET(): Promise<Response> {
     throw new Error("OLYMPUS_URL environment variable is not defined");
   }
   try {
-    const query = `query qryAccessPoints {
-            accessPoints {
-                id
-                name
-            }
-        }`;
+    const query = `mutation mutUpdateAccessPoint($AccessPointId: String!, $name: String!) {
+  updateAccessPoint(id: $AccessPointId, name: $name) {
+    ... on accessPoint {
+      id
+      name
+    }
+    ... on errorResult {
+      error
+    }
+  }
+}`;
 
+console.log(`Updating with access point ID: ${accessPointId}`)
     const response = await fetch(process.env.OLYMPUS_URL + "/graphql", {
       method: "POST",
       headers: {
@@ -35,7 +45,7 @@ export async function GET(): Promise<Response> {
       },
       body: JSON.stringify({
         query,
-        variables: {},
+        variables: { AccessPointId: accessPointId, name: AccessPointName },
       }),
     });
 
@@ -43,16 +53,16 @@ export async function GET(): Promise<Response> {
 
     console.log(data);
 
-    return new Response(JSON.stringify(data.data.accessPoints as AccessPoint[]), {
+    return new Response(JSON.stringify(data.data.updateAccessPoint as AccessPoint), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error fetching list of access points:", error);
+    console.error("Error updating access point:", error);
 
     return new Response(
       JSON.stringify({
-        error: "Failed to fetch customer access points",
+        error: "Failed to update access point",
       }),
       {
         status: 500,
