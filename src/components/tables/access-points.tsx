@@ -54,7 +54,7 @@ export default function AccessPointsTable() {
     });
     setAccessPoints(newAccessPoints);
   }
-  function onCellClick(args: CellMouseArgs<Row>, event: CellMouseEvent) {
+  function onCellClick(args: CellMouseArgs<Row>) {
     router.push(`/access-points/${args.row.id}`);
   }
   return <DataGrid columns={columns} rows={accessPoints}  sortColumns={sortColumns}

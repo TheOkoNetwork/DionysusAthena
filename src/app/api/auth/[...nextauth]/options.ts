@@ -55,7 +55,7 @@ export const authOptions: NextAuthOptions = {
 
             return token;
         },
-        session({ session, token, user }: { session: Session; token: JWT, user: User }) {
+        session({ session, token }: { session: Session; token: JWT, user: User }) {
             // console.log("Session Callback:", { session, token, user });
             // Copy access_token from token to session
             session.accessToken = token.access_token;
