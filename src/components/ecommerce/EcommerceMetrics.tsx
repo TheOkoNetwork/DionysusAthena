@@ -1,9 +1,23 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Badge from "../ui/badge/Badge";
 import { ArrowDownIcon, ArrowUpIcon, BoxIconLine, GroupIcon } from "@/icons";
 
+
 export const EcommerceMetrics = () => {
+  const [totalCustomerCount, setTotalCustomerCount] = useState(270271987);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const increment = Math.floor(Math.random() * (350 - 25 + 1)) + 25;
+      setTotalCustomerCount((prevCount) => prevCount + increment);
+    }, 500); // Increment every 500 milliseconds
+
+    return () => clearInterval(intervalId); // Clear interval on component unmount
+  }, []);
+
+
+
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6">
       {/* <!-- Metric Item Start --> */}
@@ -18,7 +32,7 @@ export const EcommerceMetrics = () => {
               Customers
             </span>
             <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
-              3,782
+              {totalCustomerCount.toLocaleString()}
             </h4>
           </div>
           <Badge color="success">
