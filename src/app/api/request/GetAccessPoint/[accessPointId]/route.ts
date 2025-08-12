@@ -10,9 +10,13 @@ interface AccessPoint {
 interface Params {
   accessPointId: string;
 }
-export async function GET(request: Request,response: Response, { params }: { params: Params }): Promise<Response> {
+
+
+export async function GET(request: Request,
+  { params }: { params: Promise<{ accessPointId: string }> }): Promise<Response> {
   const session = await getServerSession(authOptions);
 
+  const {accessPointId} = await params;
   console.log("Session:", session);
   if (!session?.accessToken) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -37,7 +41,7 @@ export async function GET(request: Request,response: Response, { params }: { par
       },
       body: JSON.stringify({
         query,
-        variables: {accessPointId: params.accessPointId},
+        variables: {accessPointId: accessPointId},
       }),
     });
 

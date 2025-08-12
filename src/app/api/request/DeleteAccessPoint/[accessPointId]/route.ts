@@ -5,7 +5,8 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 interface Params {
   accessPointId: string;
 }
-export async function DELETE(request: Request, response: Response, { params }: { params: Params }): Promise<Response> {
+export async function DELETE(  request: Request,
+  { params }: { params: Promise<{ accessPointId: string }> }): Promise<Response> {
   const session = await getServerSession(authOptions);
   const { accessPointId } = await params;
 

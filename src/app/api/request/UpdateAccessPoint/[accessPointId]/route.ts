@@ -10,7 +10,8 @@ interface AccessPoint {
 interface Params {
   accessPointId: string;
 }
-export async function POST(request: Request, response:Response, { params }: { params: Params }): Promise<Response> {
+export async function POST(  request: Request,
+  { params }: { params: Promise<{ accessPointId: string }> }): Promise<Response> {
   const session = await getServerSession(authOptions);
 const { accessPointId } = await params;
   const { name: AccessPointName } = await request.json()
