@@ -9,8 +9,6 @@ import {
   ChevronDownIcon,
   GridIcon,
   HorizontaLDots,
-  ListIcon,
-  UserCircleIcon,
 } from "../icons/index";
 // import SidebarWidget from "./SidebarWidget";
 
