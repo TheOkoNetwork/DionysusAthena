@@ -10,7 +10,12 @@ export const metadata: Metadata = {
   // other metadata
 };
 
-export default function AccessPoint({ params: { accessPointId } }: { params: { accessPointId: string } }) {
+export default async function AccessPoint({
+  params,
+}: {
+  params: Promise<{ accessPointId: string }>
+}) {
+  const { accessPointId } = await params;
   return (
     <div>
       <PageBreadcrumb pageTitle="Access Point" />

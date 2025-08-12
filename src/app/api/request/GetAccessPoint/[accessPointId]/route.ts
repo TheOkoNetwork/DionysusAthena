@@ -10,7 +10,7 @@ interface AccessPoint {
 interface Params {
   accessPointId: string;
 }
-export async function GET(request: Request, { params }: { params: Params }): Promise<Response> {
+export async function GET(request: Request,response: Response, { params }: { params: Params }): Promise<Response> {
   const session = await getServerSession(authOptions);
 
   console.log("Session:", session);
