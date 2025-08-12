@@ -7,9 +7,7 @@ interface AccessPoint {
   id: string;
   name: string;
 }
-interface Params {
-  accessPointId: string;
-}
+
 export async function POST(  request: Request,
   { params }: { params: Promise<{ accessPointId: string }> }): Promise<Response> {
   const session = await getServerSession(authOptions);

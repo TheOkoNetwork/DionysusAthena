@@ -7,10 +7,6 @@ interface AccessPoint {
   id: string;
   name: string;
 }
-interface Params {
-  accessPointId: string;
-}
-
 
 export async function GET(request: Request,
   { params }: { params: Promise<{ accessPointId: string }> }): Promise<Response> {
