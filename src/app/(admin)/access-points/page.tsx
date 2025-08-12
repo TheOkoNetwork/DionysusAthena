@@ -12,8 +12,6 @@ export const metadata: Metadata = {
 };
 
 export default function AccessPoints() {
-  
-
   return (
     <div>
       <PageBreadcrumb pageTitle="Access Points" />
@@ -22,8 +20,8 @@ export default function AccessPoints() {
         <Button size="sm" variant="primary" destinationUrl="/access-points/create">
               Create Access Point
             </Button>
-
-          <AccessPointsTable />
+          
+          <AccessPointsTable  />
         </ComponentCard>
       </div>
     </div>
