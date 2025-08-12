@@ -3,7 +3,7 @@
 import 'react-data-grid/lib/styles.css';
 import {useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
-import { DataGrid, type Column,SortColumn,CellMouseArgs, CellMouseEvent } from 'react-data-grid';
+import { DataGrid, type Column,SortColumn,CellMouseArgs } from 'react-data-grid';
 
 interface Row {
   id: string;
