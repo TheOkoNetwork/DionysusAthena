@@ -6,10 +6,15 @@ import { ArrowDownIcon, ArrowUpIcon, BoxIconLine, GroupIcon } from "@/icons";
 
 export const EcommerceMetrics = () => {
   const [totalCustomerCount, setTotalCustomerCount] = useState(270271987);
+  const [totalCustomerCountIncrease, setTotalCustomerCountIncrease] = useState(0);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
       const increment = Math.floor(Math.random() * (350 - 25 + 1)) + 25;
+      // Calculate percentage increase based on the previous total customer count
+      const percentageIncrease = (increment / totalCustomerCount) * 100;
+      // Update the percentage increase state with two decimal places
+      setTotalCustomerCountIncrease(parseFloat(percentageIncrease.toFixed(2)));
       setTotalCustomerCount((prevCount) => prevCount + increment);
     }, 500); // Increment every 500 milliseconds
 
@@ -35,10 +40,13 @@ export const EcommerceMetrics = () => {
               {totalCustomerCount.toLocaleString()}
             </h4>
           </div>
-          <Badge color="success">
-            <ArrowUpIcon />
-            11.01%
-          </Badge>
+
+          {totalCustomerCountIncrease > 0 && (
+            <Badge color="success">
+              <ArrowUpIcon />
+              {totalCustomerCountIncrease}%
+            </Badge>
+          )}
         </div>
       </div>
       {/* <!-- Metric Item End --> */}
