@@ -26,7 +26,7 @@ const columns: Column<Customer>[] = [
 
 export default function CustomersTable() {
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [typesenseHost, setTypesenseHost] = useState();
+  const [typesenseHost, setTypesenseHost] = useState<string | undefined>();
   const [typesenseKey, setTypesenseKey] = useState();
   const [query, setQuery] = useState('');
   const router = useRouter();
