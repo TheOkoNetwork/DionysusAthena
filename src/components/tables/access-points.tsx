@@ -20,7 +20,6 @@ const columns: Column<AccessPoint>[] = [
 
 export default function AccessPointsTable() {
   const [AccessPoints, setAccessPoints] = useState<AccessPoint[]>([]);
-  const [typesenseKey, setTypesenseKey] = useState();
   const [typesenseKey, setTypesenseKey] = useState<string | undefined>(undefined);
   const [typesenseHost, setTypesenseHost] = useState<string | undefined>(undefined);
   const [query, setQuery] = useState('');
