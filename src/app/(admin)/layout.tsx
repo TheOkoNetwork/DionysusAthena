@@ -24,7 +24,8 @@ export default function AdminLayout({
       // If the user is not authenticated, redirect to the sign-in page
       return redirect('/signin')
     }
-  // Dynamic class for main content margin based on sidebar state
+    // window.alert(JSON.stringify(session));
+    // Dynamic class for main content margin based on sidebar state
   const mainContentMargin = isMobileOpen
     ? "ml-0"
     : isExpanded || isHovered
