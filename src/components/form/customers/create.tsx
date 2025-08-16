@@ -29,7 +29,7 @@ export default function CustomerCreateForm() {
       toast.error("Email address cannot be empty.");
       return;
     }
-    if (!String(phoneNumber).trim()) {
+    if (!phoneNumber?.trim()) {
       toast.error("Phone number cannot be empty.");
       return;
     }
