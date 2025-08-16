@@ -1,22 +1,24 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Badge from "../ui/badge/Badge";
-import { ArrowDownIcon, ArrowUpIcon, BoxIconLine, GroupIcon } from "@/icons";
+import { ArrowDownIcon, BoxIconLine, GroupIcon } from "@/icons";
 
 
 export const EcommerceMetrics = () => {
-  const [totalCustomerCount, setTotalCustomerCount] = useState(270271987);
-  const [totalCustomerCountIncrease, setTotalCustomerCountIncrease] = useState(0);
+  const [totalCustomerCount, setTotalCustomerCount] = useState(0);
+  // const [totalCustomerCountIncrease, setTotalCustomerCountIncrease] = useState(0);
 
   useEffect(() => {
+    fetch('/api/request/GetCustomersCount').then(r => r.json()).then(function (countResult) {
+      setTotalCustomerCount(countResult.count);
+    })
+
     const intervalId = setInterval(() => {
-      const increment = Math.floor(Math.random() * (350 - 25 + 1)) + 25;
-      // Calculate percentage increase based on the previous total customer count
-      const percentageIncrease = (increment / totalCustomerCount) * 100;
-      // Update the percentage increase state with two decimal places
-      setTotalCustomerCountIncrease(parseFloat(percentageIncrease.toFixed(2)));
-      setTotalCustomerCount((prevCount) => prevCount + increment);
-    }, 500); // Increment every 500 milliseconds
+      // setTotalCustomerCountIncrease(parseFloat(percentageIncrease.toFixed(2)));
+      fetch('/api/request/GetCustomersCount').then(r => r.json()).then(function (countResult) {
+        setTotalCustomerCount(countResult.count);
+      })
+    }, 5000); // Call every 5000 milliseconds
 
     return () => clearInterval(intervalId); // Clear interval on component unmount
   }, []);
@@ -40,13 +42,12 @@ export const EcommerceMetrics = () => {
               {totalCustomerCount.toLocaleString()}
             </h4>
           </div>
-
-          {totalCustomerCountIncrease > 0 && (
+          {/* {totalCustomerCountIncrease > 0 && (
             <Badge color="success">
               <ArrowUpIcon />
               {totalCustomerCountIncrease}%
             </Badge>
-          )}
+          )} */}
         </div>
       </div>
       {/* <!-- Metric Item End --> */}

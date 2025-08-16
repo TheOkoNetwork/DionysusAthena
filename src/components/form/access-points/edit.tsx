@@ -35,6 +35,7 @@ export default function AccessPointEditForm({ accessPointId }: AccessPointEditFo
     };
     fetchAccessPoint();
   }, [accessPointId, router]);
+  
   const handleEditAccessPoint = async () => {
     if (!accessPointName.trim()) {
       toast.error("Access Point Name cannot be empty.");
