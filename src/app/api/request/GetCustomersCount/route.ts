@@ -44,7 +44,7 @@ export async function GET(): Promise<Response> {
 
     console.log(JSON.stringify(data));
 
-    return new Response(JSON.stringify(data.data.customers_count.aggregate as Aggregate[]), {
+    return new Response(JSON.stringify(data.data.customers_count.aggregate as Aggregate), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
