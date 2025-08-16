@@ -30,6 +30,12 @@ const navItems: NavItem[] = [
     icon: <CalenderIcon />,
     name: "Access Points",
     path: "/access-points",
+  },
+  
+  {
+    icon: <CalenderIcon />,
+    name: "Customers",
+    path: "/customers",
   }
 ];
 
