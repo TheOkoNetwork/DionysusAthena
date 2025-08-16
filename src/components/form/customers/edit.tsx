@@ -114,7 +114,7 @@ export default function CustomerEditForm({ customerId }: CustomerEditFormProps) 
       }
     };
     fetchCustomer();
-  }, [customerId, router]);
+  }, [customerId]);
 
 
   return (
