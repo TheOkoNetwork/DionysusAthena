@@ -26,7 +26,7 @@ type AccessPoint = {
 export default function BarcodeScannerComponent() {
   const [scanResults, setScanResults] = useState<ScanResults>({ hasResult: false });
   const [scanAcknowledged, setScanAcknowledged] = useState<boolean>(false);
-  const [accessPoints, setAccessPoints] = useState<[AccessPoint]>();
+  const [accessPoints, setAccessPoints] = useState<AccessPoint[]>();
   const [selectedAccessPoint, setSelectedAccessPoint] = useState<string>();
 
   const [scannerStatus, setScannerStatus] = useState<string>("Loading");
