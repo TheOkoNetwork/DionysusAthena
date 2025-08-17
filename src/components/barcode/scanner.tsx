@@ -72,73 +72,67 @@ export default function BarcodeScannerComponent() {
       setScannerStatus("Processing scan");
       setScanResults({
         hasResult: false
-      })
+      });
+      setScanAcknowledged(false);
       setData(result.getText());
       setScanDivClass("");
       playScannedSfx();
-      setTimeout(function () {
-        setScanAcknowledged(false);
-        setScannerStatus("*Rejected*");
+      //post request to validate ticket /api/request/ValidateTicket
+      fetch('/api/request/ValidateTicket', {
+        method: "POST",
+        headers: {
+          'Content-Type': 'Application/json',
+        },
+        body: JSON.stringify({
+          barcode: result.getText(),
+          access_point_id: selectedAccessPoint
+        })
+      }).then(r => r.json()).then(function (validateResponse: ScanResults) {
+        validateResponse.hasResult  = true;
+        setScanResults(validateResponse);
+          switch (validateResponse.status) {
+            case "ACCEPTED":
+              setScanDivClass("bg-green-500");
+              playAcceptedSfx();
+              break;
+              case "REJECTED":
+              setScanDivClass("bg-red-500");
+              playRejectedSfx();
+              break
+              case "ATTENTION":
+              setScanDivClass("bg-yellow-300");
+              playAttentionSfx();
+              break
+              case "OFFLINE":
+              setScanDivClass("bg-blue-600");
+              playOfflineSfx();
+              break
+            default:
+              case "ATTENTION":
+              setScanDivClass("bg-yellow-300");
+              playAttentionSfx();
+              break;
+          };
+
+          setScannerStatus("Ready for next scan");
+          setScannerActive(true);
+          const currentSelectedDeviceId = JSON.parse(JSON.stringify(selectedDeviceId));
+          setSelectedDeviceId('');
+          setTimeout(function () {
+            setSelectedDeviceId(currentSelectedDeviceId);
+          }, 250);
+      }).catch(function (error) {
+        console.log(error);
+        setScannerStatus("*ERROR*");
         setScanDivClass("bg-red-500");
         setScanResults({
           hasResult: true,
-          message: "Already scanned by R. Astley",
-          product: "MAP Group Waterpark Takeover 2025",
-          type: "Individual",
+          message: "Error submitting scan for validation",
           acknowledgeRequired: true,
           status: 'REJECTED'
         })
         playRejectedSfx();
-      }, 2000);
-      setTimeout(function () {
-        setScannerStatus("Accepted");
-        setScanDivClass("bg-green-500");
-        setScanResults({
-          hasResult: true,
-          message: "Welcome in!",
-          product: "MAP Group Waterpark Takeover 2025",
-          type: "Individual",
-          ticketHolder: "R. Astley",
-          status: 'ACCEPTED'
-        })
-        playAcceptedSfx();
-      }, 4000);
-      setTimeout(function () {
-        setScannerStatus("**ATTENTION**");
-        setScanDivClass("bg-yellow-300");
-        setScanAcknowledged(false);
-        setScanResults({
-          hasResult: true,
-          message: "Welcome in!",
-          product: "MAP Group Waterpark Takeover 2025",
-          type: "Complimentary",
-          ticketHolder: "N. Gonna",
-          acknowledgeRequired: true,
-          status: 'ACCEPTED'
-        })
-        playAttentionSfx();
-      }, 6000);
-      setTimeout(function () {
-        setScannerStatus("**OFFLINE**");
-        setScanAcknowledged(false);
-        setScanResults({
-          hasResult: true,
-          message: "Scan is offline",
-          acknowledgeRequired: true,
-          status: 'OFFLINE'
-        })
-        setScanDivClass("bg-blue-600");
-        playOfflineSfx();
-      }, 8000);
-      setTimeout(function () {
-        setScannerStatus("Ready for next scan");
-        setScannerActive(true);
-        const currentSelectedDeviceId = JSON.parse(JSON.stringify(selectedDeviceId));
-        setSelectedDeviceId('');
-        setTimeout(function () {
-          setSelectedDeviceId(currentSelectedDeviceId);
-        }, 250)
-      }, 10000);
+      })
     },
   });
 
@@ -187,7 +181,7 @@ export default function BarcodeScannerComponent() {
     return <div>Loading access points...</div>;
   }
   if (!scannerActive) {
-    return <div  className={scanDivClass}>{scannerStatus}</div>;
+    return <div className={scanDivClass}>{scannerStatus}</div>;
   }
 
   if (scanResults.hasResult && scanResults.acknowledgeRequired && !scanAcknowledged) {

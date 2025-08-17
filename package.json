@@ -30,6 +30,7 @@
     "install": "^0.13.0",
     "next": "15.4.6",
     "next-auth": "^4.24.11",
+    "next-build-id": "^3.0.0",
     "npm": "^11.5.2",
     "react": "^19.0.0",
     "react-apexcharts": "^1.7.0",
