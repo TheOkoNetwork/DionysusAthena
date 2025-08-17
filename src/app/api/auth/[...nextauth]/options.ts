@@ -80,7 +80,7 @@ export const authOptions: NextAuthOptions = {
             clientId: process.env.AUTH_OIDC_CLIENT_ID, // Client ID for authentication from environment variable
             clientSecret: process.env.AUTH_OIDC_CLIENT_SECRET, // Client Secret for authentication from environment variable
             authorization: {
-                params: { scope: "openid email profile offline_access" },
+                params: { scope: "openid email profile offline_access"},
             },
             profile(profile: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
                 // Log essential information when a user logs in

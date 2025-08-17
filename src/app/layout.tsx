@@ -1,5 +1,7 @@
 import { Outfit } from 'next/font/google';
 import './globals.css';
+import "@radix-ui/themes/styles.css";
+import { Theme } from "@radix-ui/themes";
 
 import { ThemeProvider } from '@/context/ThemeContext';
 import ClientLayout from "./client-layout";
@@ -17,12 +19,14 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${outfit.className} dark:bg-gray-900`}>
 
-      {/* <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+        {/* <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
       <script>eruda.init();</script> */}
 
         <ConfigLoader />
         <ThemeProvider>
-        <ClientLayout>{children}</ClientLayout>
+          <Theme>
+            <ClientLayout>{children}</ClientLayout>
+          </Theme>
         </ThemeProvider>
       </body>
     </html>

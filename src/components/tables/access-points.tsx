@@ -58,7 +58,7 @@ export default function AccessPointsTable() {
           if (typedRes.hits) { setAccessPoints(typedRes.hits.map((hit: SearchResponseHit<AccessPoint>) => hit.document)); }
         });
     }
-  }, [typesenseKey, query]);
+  }, [typesenseKey,typesenseHost, query]);
 
 
   function onCellClick(args: CellMouseArgs<AccessPoint>) {

@@ -64,7 +64,7 @@ export default function CustomersTable() {
           if (typedRes.hits) { setCustomers(typedRes.hits.map((hit: SearchResponseHit<Customer>) => hit.document)); }
         });
     }
-  }, [typesenseKey, query]);
+  }, [typesenseKey, typesenseHost, query]);
 
 
   function onCellClick(args: CellMouseArgs<Customer>) {
