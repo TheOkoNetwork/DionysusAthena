@@ -166,7 +166,7 @@ export default function BarcodeScannerComponent() {
       if (videoDevices.length > 0) {
         if (!selectedDeviceId) {
           setScannerStatus(selectedAccessPoint ? 'Camera initialization in progress' : 'Pending access point selection');
-          setSelectedDeviceId(previouslySelectedDeviceId ||  videoDevices[0].deviceId);
+          setSelectedDeviceId(previouslySelectedDeviceId || videoDevices[0].deviceId);
           setTimeout(function () {
             setScannerStatus(selectedAccessPoint ? 'Camera initialization in progress' : 'Pending access point selection');
             setSelectedDeviceId('');
