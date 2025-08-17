@@ -34,6 +34,7 @@ export default function BarcodeScannerComponent() {
   const [data, setData] = useState<string>("");
   const [scannerActive, setScannerActive] = useState<boolean>(true);
   const [selectedDeviceId, setSelectedDeviceId] = useState<string | undefined>(undefined);
+  const [previouslySelectedDeviceId, setPreviouslySelectedDeviceId] = useState<string | undefined>(undefined);
   const [playScannedSfx] = useSound("/sounds/scan/scanned.wav");
   const [playAcceptedSfx] = useSound("/sounds/scan/accepted.wav");
   const [playRejectedSfx] = useSound("/sounds/scan/rejected.wav");
@@ -47,11 +48,15 @@ export default function BarcodeScannerComponent() {
 
   const acknowledgeScan = () => {
     setScanAcknowledged(true);
+    setPreviouslySelectedDeviceId(selectedDeviceId);
     const currentSelectedDeviceId = JSON.parse(JSON.stringify(selectedDeviceId));
     setSelectedDeviceId('');
     setTimeout(function () {
       setSelectedDeviceId(currentSelectedDeviceId);
-    }, 250);
+    }, 500);
+    setTimeout(function () {
+      setSelectedDeviceId(currentSelectedDeviceId);
+    }, 1000);
   };
 
   const accessPointSelectionMade = (accessPointId: string) => {
@@ -116,11 +121,15 @@ export default function BarcodeScannerComponent() {
 
           setScannerStatus("Ready for next scan");
           setScannerActive(true);
+          setPreviouslySelectedDeviceId(selectedDeviceId);
           const currentSelectedDeviceId = JSON.parse(JSON.stringify(selectedDeviceId));
           setSelectedDeviceId('');
           setTimeout(function () {
             setSelectedDeviceId(currentSelectedDeviceId);
-          }, 250);
+          }, 500);
+          setTimeout(function () {
+            setSelectedDeviceId(currentSelectedDeviceId);
+          }, 1000);
       }).catch(function (error) {
         console.log(error);
         setScannerStatus("*ERROR*");
@@ -157,7 +166,7 @@ export default function BarcodeScannerComponent() {
       if (videoDevices.length > 0) {
         if (!selectedDeviceId) {
           setScannerStatus(selectedAccessPoint ? 'Camera initialization in progress' : 'Pending access point selection');
-          setSelectedDeviceId(videoDevices[0].deviceId);
+          setSelectedDeviceId(previouslySelectedDeviceId || videoDevices[0].deviceId);
           setTimeout(function () {
             setScannerStatus(selectedAccessPoint ? 'Camera initialization in progress' : 'Pending access point selection');
             setSelectedDeviceId('');
