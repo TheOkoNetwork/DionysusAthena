@@ -44,7 +44,7 @@ const navItems: NavItem[] = [
   },
   {
     icon: <CalenderIcon />,
-    name: "Ticket Config - IN DEV",
+    name: "Ticket Products",
     subItems: [
       { name: "Ticket Types", path: "/ticket-types" },
       { name: "Ticket Products", path: "/ticket-products" },
