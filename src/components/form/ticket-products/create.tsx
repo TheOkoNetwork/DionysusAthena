@@ -10,34 +10,15 @@ import { TicketType } from '@/types/tickets';
 
 export default function TicketProductCreateForm() {
   const [name, setName] = useState('');
-  const [ticketTypeId, setTicketTypeId] = useState('');
-  const [ticketTypes, setTicketTypes] = useState<TicketType[]>([]);
   const router = useRouter();
 
-  useEffect(() => {
-    // Fetch ticket types for the dropdown
-    fetch('/api/request/GetTicketTypes')
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setTicketTypes(data);
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching ticket types:', error);
-      });
-  }, []);
 
   const handleCreateTicketProduct = async () => {
     if (!name.trim()) {
       toast.error("Name cannot be empty.");
       return;
     }
-    if (!ticketTypeId) {
-      toast.error("Please select a ticket type.");
-      return;
-    }
-
+    
     try {
       const response = await fetch('/api/request/CreateTicketProduct', {
         method: 'POST',
@@ -46,7 +27,6 @@ export default function TicketProductCreateForm() {
         },
         body: JSON.stringify({ 
           name: name, 
-          ticketTypeId: ticketTypeId
         }),
       });
 
@@ -70,21 +50,6 @@ export default function TicketProductCreateForm() {
         <div>
           <Label>Name</Label>
           <Input type="text" defaultValue={name} onChange={(e) => setName(e.target.value)} />
-        </div>
-        <div>
-          <Label>Ticket Type</Label>
-          <select 
-            value={ticketTypeId} 
-            onChange={(e) => setTicketTypeId(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Select a ticket type</option>
-            {ticketTypes.map((ticketType) => (
-              <option key={ticketType.id} value={ticketType.id}>
-                {ticketType.name}
-              </option>
-            ))}
-          </select>
         </div>
       </div>
       <div className="flex justify-end mt-6">

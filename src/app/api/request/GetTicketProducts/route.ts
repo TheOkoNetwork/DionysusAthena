@@ -21,7 +21,6 @@ export async function GET(): Promise<Response> {
       ticketProducts {
         id
         name
-        ticket_type_id
       }
     }`;
 

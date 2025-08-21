@@ -44,11 +44,10 @@ const navItems: NavItem[] = [
   },
   {
     icon: <CalenderIcon />,
-    name: "Tickets",
+    name: "Ticket Config - IN DEV",
     subItems: [
       { name: "Ticket Types", path: "/ticket-types" },
       { name: "Ticket Products", path: "/ticket-products" },
-      { name: "Ticket Product Types", path: "/ticket-product-types" }
     ],
   },
   {

@@ -9,7 +9,6 @@ import { TicketProduct } from '@/types/tickets';
 const columns: Column<TicketProduct>[] = [
   { key: 'id', name: 'ID' },
   { key: 'name', name: 'Name' },
-  { key: 'ticket_type_id', name: 'Ticket Type ID' }
 ];
 
 export default function TicketProductsTable() {
