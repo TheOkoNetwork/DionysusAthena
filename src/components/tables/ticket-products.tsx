@@ -9,10 +9,7 @@ import { TicketProduct } from '@/types/tickets';
 const columns: Column<TicketProduct>[] = [
   { key: 'id', name: 'ID' },
   { key: 'name', name: 'Name' },
-  { key: 'description', name: 'Description' },
-  { key: 'price', name: 'Price' },
-  { key: 'ticket_type_id', name: 'Ticket Type ID' },
-  { key: 'active', name: 'Active', sortable: true }
+  { key: 'ticket_type_id', name: 'Ticket Type ID' }
 ];
 
 export default function TicketProductsTable() {
@@ -37,7 +34,8 @@ export default function TicketProductsTable() {
   }, []);
 
   function onCellClick(args: CellMouseArgs<TicketProduct>) {
-    router.push(`/ticket-products/${args.row.id}`);
+    // Navigate to ticket products list page since we don't have individual detail pages
+    router.push(`/ticket-products`);
   }
 
   if (loading) {

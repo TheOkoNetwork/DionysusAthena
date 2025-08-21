@@ -8,9 +8,7 @@ import { TicketProductType } from '@/types/tickets';
 
 const columns: Column<TicketProductType>[] = [
   { key: 'id', name: 'ID' },
-  { key: 'name', name: 'Name' },
-  { key: 'description', name: 'Description' },
-  { key: 'active', name: 'Active', sortable: true }
+  { key: 'name', name: 'Name' }
 ];
 
 export default function TicketProductTypesTable() {
@@ -35,7 +33,8 @@ export default function TicketProductTypesTable() {
   }, []);
 
   function onCellClick(args: CellMouseArgs<TicketProductType>) {
-    router.push(`/ticket-product-types/${args.row.id}`);
+    // Navigate to ticket product types list page since we don't have individual detail pages
+    router.push(`/ticket-product-types`);
   }
 
   if (loading) {

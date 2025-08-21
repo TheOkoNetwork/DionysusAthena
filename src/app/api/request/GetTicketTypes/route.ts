@@ -17,12 +17,10 @@ export async function GET(): Promise<Response> {
   }
   
   try {
-    const query = `query qruTicketTypes {
+    const query = `query qryTicketTypes {
       ticketTypes {
         id
         name
-        description
-        active
       }
     }`;
 

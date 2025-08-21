@@ -17,14 +17,11 @@ export async function GET(): Promise<Response> {
   }
   
   try {
-    const query = `query qruTicketProducts {
+    const query = `query qryTicketProducts {
       ticketProducts {
         id
         name
-        description
-        price
         ticket_type_id
-        active
       }
     }`;
 

@@ -10,10 +10,7 @@ import { TicketType } from '@/types/tickets';
 
 export default function TicketProductCreateForm() {
   const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [price, setPrice] = useState<number | undefined>();
   const [ticketTypeId, setTicketTypeId] = useState('');
-  const [active, setActive] = useState(true);
   const [ticketTypes, setTicketTypes] = useState<TicketType[]>([]);
   const router = useRouter();
 
@@ -49,10 +46,7 @@ export default function TicketProductCreateForm() {
         },
         body: JSON.stringify({ 
           name: name, 
-          description: description || undefined, 
-          price: price,
-          ticketTypeId: ticketTypeId,
-          active: active 
+          ticketTypeId: ticketTypeId
         }),
       });
 
@@ -60,7 +54,7 @@ export default function TicketProductCreateForm() {
 
       if (response.ok && result.id) {
         toast.success("Ticket product created successfully!");
-        router.push(`/ticket-products/${result.id}`);
+        router.push(`/ticket-products`);
       } else {
         toast.error(result.error || "Failed to create ticket product.");
       }
@@ -78,19 +72,6 @@ export default function TicketProductCreateForm() {
           <Input type="text" defaultValue={name} onChange={(e) => setName(e.target.value)} />
         </div>
         <div>
-          <Label>Description</Label>
-          <Input type="text" defaultValue={description} onChange={(e) => setDescription(e.target.value)} />
-        </div>
-        <div>
-          <Label>Price</Label>
-          <Input 
-            type="number" 
-            step={0.01}
-            defaultValue={price || ''} 
-            onChange={(e) => setPrice(e.target.value ? parseFloat(e.target.value) : undefined)} 
-          />
-        </div>
-        <div>
           <Label>Ticket Type</Label>
           <select 
             value={ticketTypeId} 
@@ -104,17 +85,6 @@ export default function TicketProductCreateForm() {
               </option>
             ))}
           </select>
-        </div>
-        <div>
-          <Label>
-            <input 
-              type="checkbox" 
-              checked={active} 
-              onChange={(e) => setActive(e.target.checked)} 
-              className="mr-2"
-            />
-            Active
-          </Label>
         </div>
       </div>
       <div className="flex justify-end mt-6">

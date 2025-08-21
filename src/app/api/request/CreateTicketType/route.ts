@@ -5,7 +5,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 
 export async function POST(request: Request): Promise<Response> {
   const session = await getServerSession(authOptions);
-  const { name, description, active } = await request.json();
+  const { name } = await request.json();
   
   console.log("Session:", session);
   if (!session?.accessToken) {
@@ -17,8 +17,8 @@ export async function POST(request: Request): Promise<Response> {
   }
   
   try {
-    const query = `mutation mutCreateTicketType($name: String!, $description: String, $active: Boolean!) {
-      createTicketType(name: $name, description: $description, active: $active) {
+    const query = `mutation mutCreateTicketType($name: String!) {
+      createTicketType(name: $name) {
         ... on ticketType {
           id
         }
@@ -36,7 +36,7 @@ export async function POST(request: Request): Promise<Response> {
       },
       body: JSON.stringify({
         query,
-        variables: { name: name, description: description, active: active },
+        variables: { name: name },
       }),
     });
 

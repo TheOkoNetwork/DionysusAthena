@@ -9,8 +9,6 @@ import { toast } from 'react-toastify';
 
 export default function TicketProductTypeCreateForm() {
   const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [active, setActive] = useState(true);
   const router = useRouter();
 
   const handleCreateTicketProductType = async () => {
@@ -26,9 +24,7 @@ export default function TicketProductTypeCreateForm() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-          name: name, 
-          description: description || undefined, 
-          active: active 
+          name: name
         }),
       });
 
@@ -36,7 +32,7 @@ export default function TicketProductTypeCreateForm() {
 
       if (response.ok && result.id) {
         toast.success("Ticket product type created successfully!");
-        router.push(`/ticket-product-types/${result.id}`);
+        router.push(`/ticket-product-types`);
       } else {
         toast.error(result.error || "Failed to create ticket product type.");
       }
@@ -52,21 +48,6 @@ export default function TicketProductTypeCreateForm() {
         <div>
           <Label>Name</Label>
           <Input type="text" defaultValue={name} onChange={(e) => setName(e.target.value)} />
-        </div>
-        <div>
-          <Label>Description</Label>
-          <Input type="text" defaultValue={description} onChange={(e) => setDescription(e.target.value)} />
-        </div>
-        <div>
-          <Label>
-            <input 
-              type="checkbox" 
-              checked={active} 
-              onChange={(e) => setActive(e.target.checked)} 
-              className="mr-2"
-            />
-            Active
-          </Label>
         </div>
       </div>
       <div className="flex justify-end mt-6">
