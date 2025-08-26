@@ -4,6 +4,63 @@ import { JWT } from "next-auth/jwt";
 // implicitly handled by NextAuthOptions typing.
 // import { JWTCallbackParameters } from "next-auth/core/types";
 
+/**
+ * Extended error interface for token refresh errors
+ */
+interface TokenRefreshError extends Error {
+    status?: number;
+    responseBody?: unknown;
+}
+
+/**
+ * Refreshes an OIDC access token using the refresh token
+ */
+async function refreshAccessToken(token: JWT): Promise<JWT> {
+    try {
+        // Use the OIDC standard token endpoint
+        const url = process.env.AUTH_OIDC_ISSUER + "/oauth/v2/token";
+        
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({
+                client_id: process.env.AUTH_OIDC_CLIENT_ID!,
+                client_secret: process.env.AUTH_OIDC_CLIENT_SECRET!,
+                grant_type: "refresh_token",
+                refresh_token: token.refresh_token!,
+            }),
+        });
+
+        const refreshedTokens = await response.json();
+
+        if (!response.ok) {
+            console.error("Failed to refresh access token:", refreshedTokens);
+            const error: TokenRefreshError = new Error(
+                `Failed to refresh access token: ${response.status} ${response.statusText} - ${JSON.stringify(refreshedTokens)}`
+            );
+            // Optionally attach more details for downstream error handling
+            error.status = response.status;
+            error.responseBody = refreshedTokens;
+            throw error;
+        }
+
+        return {
+            ...token,
+            access_token: refreshedTokens.access_token,
+            expires_at: Math.floor(Date.now() / 1000) + refreshedTokens.expires_in,
+            refresh_token: refreshedTokens.refresh_token ?? token.refresh_token, // Fall back to old refresh token
+        };
+    } catch (error) {
+        console.error("Error refreshing access token:", error);
+        return {
+            ...token,
+            error: "RefreshAccessTokenError",
+        };
+    }
+}
+
 // Augment the NextAuth types to include accessToken in Session and access_token in JWT
 declare module "next-auth" {
     interface Session {
@@ -32,7 +89,10 @@ interface User { // Ensure user is defined
 declare module "next-auth/jwt" {
     interface JWT {
         access_token?: string;
+        refresh_token?: string;
+        expires_at?: number; // Unix timestamp when access token expires
         sub?: string; // Zitadel uses 'sub' for user ID
+        error?: string; // Error message if token refresh fails
     }
 }
 
@@ -42,9 +102,12 @@ export const authOptions: NextAuthOptions = {
     callbacks: {
         jwt: async ({ token, user, account }) => { // These parameters are typed by NextAuthOptions
             // console.log("JWT Callback:", { token, user, account });
-            // Store access_token directly on token
+            
+            // Store access_token and refresh_token on initial sign-in
             if (account?.access_token) {
                 token.access_token = account.access_token;
+                token.refresh_token = account.refresh_token;
+                token.expires_at = account.expires_at;
             }
 
             // If a user is provided (on first login), add their ID to the token
@@ -52,6 +115,17 @@ export const authOptions: NextAuthOptions = {
                 token.sub = user.id; // Store the user ID from the user object on the token's 'sub' claim
             }
 
+            // Check if the access token has expired and refresh if needed
+            if (token.expires_at && token.refresh_token) {
+                const currentTime = Math.floor(Date.now() / 1000);
+                // Refresh token 5 minutes before expiry to avoid race conditions
+                const shouldRefresh = currentTime >= (token.expires_at - 300);
+                
+                if (shouldRefresh) {
+                    console.log("Access token expired, refreshing...");
+                    return await refreshAccessToken(token);
+                }
+            }
 
             return token;
         },
