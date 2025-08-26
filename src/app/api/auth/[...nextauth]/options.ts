@@ -18,10 +18,10 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
                 "Content-Type": "application/x-www-form-urlencoded",
             },
             body: new URLSearchParams({
-                client_id: process.env.AUTH_OIDC_CLIENT_ID!,
-                client_secret: process.env.AUTH_OIDC_CLIENT_SECRET!,
+                client_id: clientId,
+                client_secret: clientSecret,
                 grant_type: "refresh_token",
-                refresh_token: token.refresh_token!,
+                refresh_token: refreshToken,
             }),
         });
 
