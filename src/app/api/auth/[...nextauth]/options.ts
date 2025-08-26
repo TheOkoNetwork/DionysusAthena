@@ -5,6 +5,14 @@ import { JWT } from "next-auth/jwt";
 // import { JWTCallbackParameters } from "next-auth/core/types";
 
 /**
+ * Extended error interface for token refresh errors
+ */
+interface TokenRefreshError extends Error {
+    status?: number;
+    responseBody?: unknown;
+}
+
+/**
  * Refreshes an OIDC access token using the refresh token
  */
 async function refreshAccessToken(token: JWT): Promise<JWT> {
@@ -18,10 +26,10 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
                 "Content-Type": "application/x-www-form-urlencoded",
             },
             body: new URLSearchParams({
-                client_id: clientId,
-                client_secret: clientSecret,
+                client_id: process.env.AUTH_OIDC_CLIENT_ID!,
+                client_secret: process.env.AUTH_OIDC_CLIENT_SECRET!,
                 grant_type: "refresh_token",
-                refresh_token: refreshToken,
+                refresh_token: token.refresh_token!,
             }),
         });
 
@@ -29,12 +37,12 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
 
         if (!response.ok) {
             console.error("Failed to refresh access token:", refreshedTokens);
-            const error = new Error(
+            const error: TokenRefreshError = new Error(
                 `Failed to refresh access token: ${response.status} ${response.statusText} - ${JSON.stringify(refreshedTokens)}`
             );
             // Optionally attach more details for downstream error handling
-            (error as any).status = response.status;
-            (error as any).responseBody = refreshedTokens;
+            error.status = response.status;
+            error.responseBody = refreshedTokens;
             throw error;
         }
 
