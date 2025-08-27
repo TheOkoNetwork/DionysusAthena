@@ -65,6 +65,7 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
 declare module "next-auth" {
     interface Session {
         accessToken?: string;
+        refreshToken?: string;
         user: { // Ensure user is defined
             id?: string | null; // Add id to user
             username?: string | null; // Add id to user
@@ -101,7 +102,7 @@ export const authOptions: NextAuthOptions = {
     secret: process.env.NEXTAUTH_SECRET,
     callbacks: {
         jwt: async ({ token, user, account }) => { // These parameters are typed by NextAuthOptions
-            // console.log("JWT Callback:", { token, user, account });
+            console.log("JWT Callback:", { token, user, account });
             
             // Store access_token and refresh_token on initial sign-in
             if (account?.access_token) {
@@ -130,9 +131,14 @@ export const authOptions: NextAuthOptions = {
             return token;
         },
         session({ session, token }: { session: Session; token: JWT, user: User }) {
-            // console.log("Session Callback:", { session, token, user });
+            console.log("Session Callback:", { session, token });
             // Copy access_token from token to session
             session.accessToken = token.access_token;
+            session.refreshToken = token.refresh_token;
+
+            if (token.expires_at) {
+                session.expires = new Date(token.expires_at * 1000).toISOString();
+            }
             if (token.sub) {
                 session.user.id = token.sub;
             };
