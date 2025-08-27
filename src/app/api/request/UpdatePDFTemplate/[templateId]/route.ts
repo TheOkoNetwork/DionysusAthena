@@ -3,8 +3,12 @@ import { NextResponse } from "next/server";
 
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 
-export async function GET(): Promise<Response> {
+
+export async function POST(  request: Request,
+  { params }: { params: Promise<{ templateId: string }> }): Promise<Response> {
   const session = await getServerSession(authOptions);
+const { templateId } = await params;
+  const { templateName,templateJson } = await request.json()
 
   console.log("Session:", session);
   if (!session?.accessToken) {
@@ -15,15 +19,19 @@ export async function GET(): Promise<Response> {
     throw new Error("OLYMPUS_URL environment variable is not defined");
   }
   try {
-    const query = `query qryTemplatePdfFonts {
-      templatePdfFonts {
-        name
-        data
-        subset
-        fallback
-      }
-    }`;
+    const query = `mutation mutUpdatePdfTemplate($templateId: String!, $templateName: String!, $template: String!) {
+  updatePdfTemplate(id: $templateId, name: $templateName, template: $template) {
+    ... on pdfTemplate {
+      id
+      name
+    }
+    ... on errorResult {
+      error
+    }
+  }
+}`;
 
+console.log(`Updating with PDF template ID: ${templateId}`)
     const response = await fetch(process.env.OLYMPUS_URL + "/graphql", {
       method: "POST",
       headers: {
@@ -32,36 +40,24 @@ export async function GET(): Promise<Response> {
       },
       body: JSON.stringify({
         query,
-        variables: {},
+        variables: { templateId: templateId, templateName: templateName,template: templateJson },
       }),
     });
 
     const data = await response.json();
 
-    console.log(JSON.stringify(data));
+    console.log(data);
 
-
-    const fonts_list = data.data.templatePdfFonts;
-
-    const fontsResponse: { [key: string]: { data: string,subset: boolean, fallback?: boolean } } = {};
-    fonts_list.forEach(function (font: { name: string; data: string; subset: boolean; fallback: boolean; }) {
-        fontsResponse[font.name] = {
-            data: font.data+`?cb=${new Date()}`,
-            subset: font.subset,
-            fallback: font.fallback
-        };
-    });
-
-    return new Response(JSON.stringify(fontsResponse), {
+    return new Response(JSON.stringify(data.data.updatePdfTemplate), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error fetching template PDF fonts:", error);
+    console.error("Error updating template:", error);
 
     return new Response(
       JSON.stringify({
-        error: "Failed to fetch template PDF fonts",
+        error: "Failed to update template",
       }),
       {
         status: 500,

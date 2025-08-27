@@ -3,8 +3,10 @@ import { NextResponse } from "next/server";
 
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 
-export async function GET(): Promise<Response> {
+
+export async function POST(  request: Request): Promise<Response> {
   const session = await getServerSession(authOptions);
+  const { templateName,templateJson } = await request.json()
 
   console.log("Session:", session);
   if (!session?.accessToken) {
@@ -15,15 +17,19 @@ export async function GET(): Promise<Response> {
     throw new Error("OLYMPUS_URL environment variable is not defined");
   }
   try {
-    const query = `query qryTemplatePdfFonts {
-      templatePdfFonts {
-        name
-        data
-        subset
-        fallback
-      }
-    }`;
+    const query = `mutation mutCreatePdfTemplate($templateName: String!, $template: String!) {
+  createPdfTemplate(name: $templateName, template: $template) {
+    ... on pdfTemplate {
+      id
+      name
+    }
+    ... on errorResult {
+      error
+    }
+  }
+}`;
 
+console.log(`Creating PDF template`)
     const response = await fetch(process.env.OLYMPUS_URL + "/graphql", {
       method: "POST",
       headers: {
@@ -32,36 +38,24 @@ export async function GET(): Promise<Response> {
       },
       body: JSON.stringify({
         query,
-        variables: {},
+        variables: { templateName: templateName,template: templateJson },
       }),
     });
 
     const data = await response.json();
 
-    console.log(JSON.stringify(data));
+    console.log(data);
 
-
-    const fonts_list = data.data.templatePdfFonts;
-
-    const fontsResponse: { [key: string]: { data: string,subset: boolean, fallback?: boolean } } = {};
-    fonts_list.forEach(function (font: { name: string; data: string; subset: boolean; fallback: boolean; }) {
-        fontsResponse[font.name] = {
-            data: font.data+`?cb=${new Date()}`,
-            subset: font.subset,
-            fallback: font.fallback
-        };
-    });
-
-    return new Response(JSON.stringify(fontsResponse), {
+    return new Response(JSON.stringify(data.data.createPdfTemplate), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error fetching template PDF fonts:", error);
+    console.error("Error creating template:", error);
 
     return new Response(
       JSON.stringify({
-        error: "Failed to fetch template PDF fonts",
+        error: "Failed to create template",
       }),
       {
         status: 500,
