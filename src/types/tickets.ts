@@ -15,3 +15,16 @@ export interface TicketProductType {
   id: string;
   name: string;
 }
+
+// Ticket interface for Typesense search
+export interface Ticket {
+  id: string;
+  barcode: string;
+  product: string;
+  type: string;
+  organiser_id: string;
+  given_name: string;
+  family_name: string;
+  email: string;
+  phone_number: string;
+}
