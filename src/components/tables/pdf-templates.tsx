@@ -48,7 +48,7 @@ export default function PDFTemplatesTable() {
   }, []);
 
   function onCellClick(args: CellMouseArgs<PDFTemplate>) {
-    // Navigate to ticket types list page since we don't have individual detail pages
+    // Navigate to PDF templates detail page since we don't have individual detail pages
     router.push(`/pdf-templates/${args.row.id}`);
   }
 
