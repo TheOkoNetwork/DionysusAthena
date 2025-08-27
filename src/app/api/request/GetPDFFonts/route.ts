@@ -46,7 +46,7 @@ export async function GET(): Promise<Response> {
     const fontsResponse: { [key: string]: { data: string,subset: boolean, fallback?: boolean } } = {};
     fonts_list.forEach(function (font: { name: string; data: string; subset: boolean; fallback: boolean; }) {
         fontsResponse[font.name] = {
-            data: font.data+`?cb=${new Date()}`,
+            data: font.data,
             subset: font.subset,
             fallback: font.fallback
         };
