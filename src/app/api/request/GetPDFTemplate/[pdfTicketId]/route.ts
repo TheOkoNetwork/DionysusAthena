@@ -3,10 +3,6 @@ import { NextResponse } from "next/server";
 
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 
-interface AccessPoint {
-  id: string;
-  name: string;
-}
 
 export async function GET(request: Request,
   { params }: { params: Promise<{ pdfTicketId: string }> }): Promise<Response> {
