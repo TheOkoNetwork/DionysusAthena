@@ -68,7 +68,8 @@ export default function StaffCreateForm() {
           <Label>Family name</Label>
           <Input type="text" onChange={(e) => setFamilyName(e.target.value)} />
         </div>
-      </div><div className="space-y-6">
+      </div>
+      <div className="space-y-6">
         <div>
           <Label>Email address</Label>
           <Input type="email" onChange={(e) => setEmail(e.target.value)} />
