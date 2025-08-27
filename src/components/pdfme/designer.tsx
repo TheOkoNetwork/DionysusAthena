@@ -3,13 +3,14 @@
 import { useRouter } from 'next/navigation';
 
 // import { generate } from "@pdfme/generator";
-import { Template, BLANK_A4_PDF } from "@pdfme/common"
+import { Template, BLANK_A4_PDF, cloneDeep } from "@pdfme/common"
 import { Designer } from "@pdfme/ui";
 import { useEffect, useState } from "react";
 import { text, barcodes, image, table, date, rectangle, line, svg, time, dateTime, select, radioGroup, checkbox, ellipse, multiVariableText } from '@pdfme/schemas';
 
 import Label from "@/components/form/Label";
 import Input from '@/components/form/input/InputField';
+import FileInput from '@/components/form/input/FileInput';
 import Button from "@/components/ui/button/Button"
 
 
@@ -27,7 +28,7 @@ export default function PDFMeDesigner({ templateId }: PDFMeDesignerProps) {
     const [template, setTemplate] = useState<Template | null>(null);
     const [templateName, setTemplateName] = useState('');
     const [templateEditable, setTemplateEditable] = useState(false);
-     const router = useRouter();
+    const router = useRouter();
 
     const saveTemplate = async function () {
         if (!d) {
@@ -59,6 +60,8 @@ export default function PDFMeDesigner({ templateId }: PDFMeDesignerProps) {
                 if (saveResult.id) {
                     toast.success(`Successfully saved template: ${templateName}`);
                     router.push("/pdf-templates");
+                } else {
+                    toast.error(`Failed to save template: ${templateName}`);
                 }
             } catch (error) {
                 console.log(error);
@@ -81,6 +84,8 @@ export default function PDFMeDesigner({ templateId }: PDFMeDesignerProps) {
                 if (createResult.id) {
                     toast.success(`Successfully created template: ${templateName}`);
                     router.push("/pdf-templates");
+                } else {
+                    toast.error(`Failed to create template: ${templateName}`);
                 }
             } catch (error) {
                 console.log(error);
@@ -90,35 +95,67 @@ export default function PDFMeDesigner({ templateId }: PDFMeDesignerProps) {
 
     }
 
+    const readFile = (file: File | null, type: 'text' | 'dataURL' | 'arrayBuffer') => {
+        return new Promise<string | ArrayBuffer>((r) => {
+            const fileReader = new FileReader();
+            fileReader.addEventListener('load', (e) => {
+                if (e && e.target && e.target.result && file !== null) {
+                    r(e.target.result);
+                }
+            });
+            if (file !== null) {
+                if (type === 'text') {
+                    fileReader.readAsText(file);
+                } else if (type === 'dataURL') {
+                    fileReader.readAsDataURL(file);
+                } else if (type === 'arrayBuffer') {
+                    fileReader.readAsArrayBuffer(file);
+                }
+            }
+        });
+    };
+    const onChangeBasePDF = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (d && e.target.files?.[0]) {
+            readFile(e.target.files[0], "dataURL").then(async (basePdf) => {
+                if (!d) {
+                    return;
+                }
+                const newTemplate = cloneDeep(d.getTemplate());
+                newTemplate.basePdf = basePdf;
+                d.updateTemplate(newTemplate);
+            });
+        }
+    };
+
     const deleteTemplate = async () => {
         console.log("Template delete called")
         if (!window.confirm("Are you sure you wish to delete this template?")) {
-          return console.log("Not deleting");
+            return console.log("Not deleting");
         };
         window.alert("Now deleting");
         try {
-          const response = await fetch(`/api/request/DeletePDFTemplate/${templateId}`, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: null,
-          });
-    
-          const result = await response.json();
-    
-          if (response.ok && result.deleted) {
-            toast.success("PDF template deleted successfully!");
-            router.push(`/pdf-templates`);
-          } else {
-              toast.error(result.error || "Failed to delete PDF template");
-          }
+            const response = await fetch(`/api/request/DeletePDFTemplate/${templateId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: null,
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.deleted) {
+                toast.success("PDF template deleted successfully!");
+                router.push(`/pdf-templates`);
+            } else {
+                toast.error(result.error || "Failed to delete PDF template");
+            }
         }
         catch (error) {
-          console.error("Error deleting PDF template:", error);
-          toast.error("An unexpected error occurred.");
+            console.error("Error deleting PDF template:", error);
+            toast.error("An unexpected error occurred.");
         }
-      };
+    };
     useEffect(() => {
         if (!templateId) {
             setTemplateEditable(true);
@@ -202,6 +239,15 @@ export default function PDFMeDesigner({ templateId }: PDFMeDesignerProps) {
                     <Input type="text" disabled={!templateEditable} defaultValue={templateName} onChange={(e) => setTemplateName(e.target.value)} />
                 </div>
             </div>
+
+            {templateEditable && (
+                <div className="space-y-6">
+                    <div>
+                        <Label>Change background PDF</Label>
+                        <FileInput accept="application/pdf" onChange={onChangeBasePDF} />
+                    </div>
+                </div>
+            )}
 
             {templateEditable && (
                 <div className="space-y-6">
