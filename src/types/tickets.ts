@@ -18,6 +18,7 @@ export interface TicketProductType {
 
 // Ticket interface for Typesense search
 export interface Ticket {
+  id: string;
   barcode: string;
   product: string;
   type: string;

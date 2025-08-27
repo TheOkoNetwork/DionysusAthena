@@ -8,6 +8,7 @@ import { SearchResponseHit } from 'typesense/lib/Typesense/Documents';
 import { Ticket } from '@/types/tickets';
 
 const columns: Column<Ticket>[] = [
+  { key: 'id', name: 'ID' },
   { key: 'barcode', name: 'Barcode' },
   { key: 'product', name: 'Product' },
   { key: 'type', name: 'Type' },
@@ -51,7 +52,7 @@ export default function TicketsTable() {
       typesense
         .collections('tickets')
         .documents()
-        .search({ 'q': query, query_by: "barcode,product,type,given_name,family_name,email,phone_number" })
+        .search({ 'q': query, query_by: "id,barcode,product,type,given_name,family_name,email,phone_number" })
         .then((res) => {
           const typedRes = res as { hits: SearchResponseHit<Ticket>[] | undefined };
           if (typedRes.hits) { 
@@ -71,7 +72,7 @@ export default function TicketsTable() {
         type="text" 
         value={query} 
         onChange={e => setQuery(e.target.value)} 
-        placeholder="Search tickets by barcode, product, type, name, email, or phone..." 
+        placeholder="Search tickets by ID, barcode, product, type, name, email, or phone..." 
         className="w-full p-2 mb-4 border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white"
       />
       <DataGrid columns={columns} rows={tickets} />
