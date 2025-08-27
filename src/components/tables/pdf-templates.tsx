@@ -29,7 +29,7 @@ export default function PDFTemplatesTable() {
     fetch('/api/request/GetPDFTemplates')
       .then((res) => res.json())
       .then((data) => {
-        console.log('Ticket Types:', data);
+        console.log('PDF Templates:', data);
         if (Array.isArray(data)) {
           setPDFTemplate(data.map(row => {
             return {
