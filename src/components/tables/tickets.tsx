@@ -52,7 +52,7 @@ export default function TicketsTable() {
       typesense
         .collections('tickets')
         .documents()
-        .search({ 'q': query, query_by: "id,barcode,product,type,given_name,family_name,email,phone_number" })
+        .search({ 'q': query, query_by: "barcode,product,type,given_name,family_name,email,phone_number" })
         .then((res) => {
           const typedRes = res as { hits: SearchResponseHit<Ticket>[] | undefined };
           if (typedRes.hits) { 
