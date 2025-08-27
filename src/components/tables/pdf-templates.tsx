@@ -42,7 +42,7 @@ export default function PDFTemplatesTable() {
         setLoading(false);
       })
       .catch((error) => {
-        console.error('Error fetching ticket types:', error);
+        console.error('Error fetching PDF templates:', error);
         setLoading(false);
       });
   }, []);
