@@ -28,7 +28,7 @@
     "algoliasearch": "^5.35.0",
     "apexcharts": "^5.3.4",
     "autoprefixer": "^10.4.20",
-    "dotenv": "^17.2.1",
+    "dotenv": "^17.2.2",
     "flatpickr": "^4.6.13",
     "install": "^0.13.0",
     "next": "15.5.0",
