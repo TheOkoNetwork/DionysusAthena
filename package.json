@@ -3,6 +3,7 @@
   "version": "2.0.2",
   "private": true,
   "scripts": {
+    "postinstall": "mkdir -p public/wasm && cp -r node_modules/scanbot-web-sdk/bundle/bin/barcode-scanner/* public/wasm",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -49,8 +50,10 @@
     "react-phone-number-input": "^3.4.12",
     "react-qr-barcode-scanner": "^2.1.8",
     "react-select": "^5.10.2",
+    "react-spinners": "^0.17.0",
     "react-toastify": "^11.0.5",
     "react-zxing": "^2.1.0",
+    "scanbot-web-sdk": "^7.2.0",
     "swiper": "^11.2.0",
     "tailwind-merge": "^3.3.1",
     "typesense-instantsearch-adapter": "^2.9.0",

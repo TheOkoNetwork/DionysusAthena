@@ -14,7 +14,7 @@ type ScanResults = {
 
 export async function POST(request: Request,): Promise<Response> {
   const session = await getServerSession(authOptions);
-  const { barcode, access_point_id } = await request.json()
+  const { barcode, access_point_id, scanning_engine } = await request.json()
   console.log(`Validating barcode: ${barcode} at access point: ${access_point_id}`)
   console.log("Session:", session);
   if (!session?.accessToken) {
@@ -47,8 +47,8 @@ export async function POST(request: Request,): Promise<Response> {
         variables: {
           barcode: barcode,
           accessPointId: access_point_id,
-          software: 'ATHENA',
-          softwareVersion: process.env.VERCEL_GIT_COMMIT_SHA || process.env.NEXT_BUILD_ID
+          software: `ATHENA_${scanning_engine}`,
+          softwareVersion: process.env.VERCEL_GIT_COMMIT_SHA || process.env.NEXT_BUILD_ID || 'DEV'
         },
       }),
     });
