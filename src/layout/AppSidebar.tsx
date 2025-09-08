@@ -49,8 +49,13 @@ const navItems: NavItem[] = [
   },
   {
     icon: <CalenderIcon />,
-    name: "Validate",
-    path: "/validate",
+    name: "Validate (zxing)",
+    path: "/validate-zxing",
+  },
+  {
+    icon: <CalenderIcon />,
+    name: "Validate (Scanbot)",
+    path: "/validate-scanbot",
   }
 ];
 

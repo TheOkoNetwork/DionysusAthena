@@ -3,7 +3,7 @@ import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import { Metadata } from "next";
 import React from "react";
 
-import BarcodeScannerComponent from "@/components/barcode/scanner"
+import ZxingBarcodeScannerComponent from "@/components/barcode/zxing"
 
 
 export const metadata: Metadata = {
@@ -19,7 +19,7 @@ export default function Validate() {
       <PageBreadcrumb pageTitle="Ticket validation" />
       <div className="space-y-6">
         <ComponentCard title="">
-          <BarcodeScannerComponent />
+          <ZxingBarcodeScannerComponent />
         </ComponentCard>
       </div>
     </div>

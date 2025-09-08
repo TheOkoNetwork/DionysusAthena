@@ -23,7 +23,7 @@ type AccessPoint = {
   id: string;
   name: string;
 }
-export default function BarcodeScannerComponent() {
+export default function ZxingBarcodeScannerComponent() {
   const [scanResults, setScanResults] = useState<ScanResults>({ hasResult: false });
   const [scanAcknowledged, setScanAcknowledged] = useState<boolean>(false);
   const [accessPoints, setAccessPoints] = useState<AccessPoint[]>();
@@ -90,7 +90,8 @@ export default function BarcodeScannerComponent() {
         },
         body: JSON.stringify({
           barcode: result.getText(),
-          access_point_id: selectedAccessPoint
+          access_point_id: selectedAccessPoint,
+          scanning_engine: "ZXING"
         })
       }).then(r => r.json()).then(function (validateResponse: ScanResults) {
         validateResponse.hasResult  = true;
@@ -151,7 +152,6 @@ export default function BarcodeScannerComponent() {
     fetch('/api/request/GetAccessPoints').then(r => r.json()).then(function (accessPointsRes) {
       setAccessPoints(accessPointsRes);
     })
-
   }, []);
 
 
