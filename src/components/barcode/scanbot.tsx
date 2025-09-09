@@ -2,8 +2,32 @@
 
 
 import ScanbotSDK from 'scanbot-web-sdk/ui';
-import { useEffect, useState, CSSProperties } from "react";
-import React from 'react';
+import { useEffect, useState, CSSProperties,useCallback, useRef } from "react";
+
+function useTimeout(callback, delay) {
+    const callbackRef = useRef(callback)
+    const timeoutRef = useRef()
+    useEffect(() => {
+        callbackRef.current = callback
+    }, [callback])
+    const set = useCallback(() => {
+        timeoutRef.current = setTimeout(() => callbackRef.current(), delay)
+    }, [delay])
+    const clear = useCallback(() => {
+        timeoutRef.current && clearTimeout(timeoutRef.current)
+    }, [])
+    useEffect(() => {
+        set()
+        return clear
+    }, [delay, set, clear])
+    const reset = useCallback(() => {
+        clear()
+        set()
+    }, [clear, set])
+    return { reset, clear }
+}
+
+
 import useSound from 'use-sound';
 import Button from "@/components/ui/button/Button";
 import Select from 'react-select'
@@ -113,6 +137,10 @@ if (result.items[0].barcode.text == previousScanBarcode) {
 if (previousScanDedupe && typeof(previousScanDedupe) == 'function') {
   previousScanDedupe();
 }
+       const { clearTimeout, resetTimeout } = useTimeout(function() {
+        setPreviousScanBarcode('');
+      }, 1000);
+      setPreviousScanDedupe(clearTimeout);
 setPreviousScanBarcode(result.items[0].barcode.text);
 
 
