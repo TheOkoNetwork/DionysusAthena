@@ -3,10 +3,12 @@
 
 import ScanbotSDK from 'scanbot-web-sdk/ui';
 import { useEffect, useState, CSSProperties } from "react";
+import React from 'react';
 import useSound from 'use-sound';
 import Button from "@/components/ui/button/Button";
 import Select from 'react-select'
 import { GridLoader } from "react-spinners";
+import { useLocalStorage } from "@uidotdev/usehooks";
 
 
 type AccessPoint = {
@@ -32,13 +34,16 @@ export default function ScanbotBarcodeScannerComponent() {
   const [playOfflineSfx] = useSound("/sounds/scan/offline.wav");
 
   const [accessPoints, setAccessPoints] = useState<AccessPoint[]>();
-  const [selectedAccessPoint, setSelectedAccessPoint] = useState<string>();
+  const [selectedAccessPoint, setSelectedAccessPoint] = useLocalStorage<string>('selectedAccessPoint');
   const [topBarColour, setTopBarColour] = useState<string>('#000000');
   const [topBarMessage, setTopBarMessage] = useState<string>('Present ticket');
   const [scanResults, setScanResults] = useState<ScanResults>({ hasResult: false });
   const [resultsLoading, setResultsLoading] = useState<boolean>(false);
   const [scanAcknowledged, setScanAcknowledged] = useState<boolean>(false);
   const [scanDivClass, setScanDivClass] = useState<string>("");
+  const [previousScanBarcode, setPreviousScanBarcode] = useState<string>("");
+  const [previousScanDedupe, setPreviousScanDedupe] = useState();
+
 
   useEffect(() => {
     setResultsLoading(true);
@@ -98,6 +103,19 @@ export default function ScanbotBarcodeScannerComponent() {
     const result = await ScanbotSDK.UI.createBarcodeScanner(config);
 
     if (result && result.items.length > 0) {
+if (result.items[0].barcode.text == previousScanBarcode) {
+  return startScanner({
+    topBarColour: config.topBar.backgroundColor,
+    topBarText: config.topBar.title.text,
+    userGuidanceText: config.userGuidance.title.text
+  })
+};
+if (previousScanDedupe && typeof(previousScanDedupe) == 'function') {
+  previousScanDedupe();
+}
+setPreviousScanBarcode(result.items[0].barcode.text);
+
+
       playScannedSfx();
       setResultsLoading(true);
       setScanResults({
@@ -153,19 +171,7 @@ export default function ScanbotBarcodeScannerComponent() {
             break
         };
       });
-
       return;
-      setTimeout(function () {
-        // playAcceptedSfx();
-        // playRejectedSfx();
-        playAttentionSfx();
-        setResultsLoading(false);
-        startScanner({
-          topBarText: "*** NOT VALID FOR ENTRY***",
-          topBarColour: "#FFFF00",
-          userGuidanceText: "Already scanned 31/12/2025 10:59 At ATR Waterpark Reception. MAP Group Waterpark Takeover 2025 - Complimentary - Gregory Oakley-Stevenson"
-        })
-      }, 2000);
     }
 
     return result;
@@ -175,8 +181,20 @@ export default function ScanbotBarcodeScannerComponent() {
     if (!selectedAccessPoint) {
       return;
     };
-    startScanner();
-  }, [selectedAccessPoint]);
+    if (!accessPoints || !accessPoints.length) {
+      return;
+    };
+
+    const currentAccessPoint = accessPoints.find(f => f.id === selectedAccessPoint);
+    if (!currentAccessPoint) {
+      return setSelectedAccessPoint('');
+    }
+    startScanner({
+      topBarText: currentAccessPoint.name,
+      topBarColour: "#000000",
+      userGuidanceText: "Present ticket"
+    });
+  }, [selectedAccessPoint,accessPoints]);
 
   if (resultsLoading) {
     return <GridLoader />
