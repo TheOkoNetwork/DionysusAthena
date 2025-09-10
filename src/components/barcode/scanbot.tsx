@@ -2,11 +2,37 @@
 
 
 import ScanbotSDK from 'scanbot-web-sdk/ui';
-import { useEffect, useState, CSSProperties } from "react";
+import { useEffect, useState, CSSProperties, useCallback, useRef } from "react";
+
+function useTimeout(callback: () => void, delay: number) {
+  const callbackRef = useRef(callback)
+  const timeoutRef = useRef(setTimeout(() => function () { }, 0));
+  useEffect(() => {
+    callbackRef.current = callback
+  }, [callback])
+  const set = useCallback(() => {
+    timeoutRef.current = setTimeout(() => callbackRef.current(), delay)
+  }, [delay])
+  const clear = useCallback(() => {
+    timeoutRef.current && clearTimeout(timeoutRef.current)
+  }, [])
+  useEffect(() => {
+    set()
+    return clear
+  }, [delay, set, clear])
+  const reset = useCallback(() => {
+    clear()
+    set()
+  }, [clear, set])
+  return { reset, clear }
+}
+
+
 import useSound from 'use-sound';
 import Button from "@/components/ui/button/Button";
 import Select from 'react-select'
 import { GridLoader } from "react-spinners";
+import { useLocalStorage } from "@uidotdev/usehooks";
 
 
 type AccessPoint = {
@@ -32,13 +58,17 @@ export default function ScanbotBarcodeScannerComponent() {
   const [playOfflineSfx] = useSound("/sounds/scan/offline.wav");
 
   const [accessPoints, setAccessPoints] = useState<AccessPoint[]>();
-  const [selectedAccessPoint, setSelectedAccessPoint] = useState<string>();
+  const [selectedAccessPoint, setSelectedAccessPoint] = useLocalStorage<string>('selectedAccessPoint');
   const [topBarColour, setTopBarColour] = useState<string>('#000000');
   const [topBarMessage, setTopBarMessage] = useState<string>('Present ticket');
   const [scanResults, setScanResults] = useState<ScanResults>({ hasResult: false });
   const [resultsLoading, setResultsLoading] = useState<boolean>(false);
   const [scanAcknowledged, setScanAcknowledged] = useState<boolean>(false);
   const [scanDivClass, setScanDivClass] = useState<string>("");
+  const [previousScanBarcode, setPreviousScanBarcode] = useState<string>("");
+  const { clear: clearTimeout, reset: resetTimeout } = useTimeout(function () {
+    setPreviousScanBarcode('');
+  }, 1250);
 
   useEffect(() => {
     setResultsLoading(true);
@@ -54,8 +84,25 @@ export default function ScanbotBarcodeScannerComponent() {
       return;
     }
     const init = async () => {
+      const LICENSE_KEY =
+  "lbeKBwflnPu1yqygUOwQlzrYLRPB+D" +
+  "CX3I90LMfzxsHOfHeH9wG0pVEq2mZI" +
+  "It4tHBg2z+Uq6ckEJkll81bLCaM1NN" +
+  "w0/sfKmEOaS7CCPnJ+OEKLo1cjz0AD" +
+  "2jkPwRpKZcTTepwTEXAMDbch2qDK8+" +
+  "QPldoGoGeFQo5ekola5p9o2iwSgahi" +
+  "sS1Kp3rAYMwT0wNvWqURTYCHseNBtH" +
+  "HwLcnYGEj+pt5nCVbX2/5gnC8poseL" +
+  "hUbBk7//PiXEPBmPslnsQbM8uJ6pc1" +
+  "0r7XAu6/fx/q81Vga4hOI7Q5ENg28l" +
+  "AGbeRhjIIwVgPMjtErqO2f2id71Smh" +
+  "dVcBhpgFqEiQ==\nU2NhbmJvdFNESw" +
+  "psb2NhbGhvc3R8bWFwZ3JvdXAuYXRo" +
+  "ZW5hLmdiLmRpb255c3VzdGlja2V0aW" +
+  "5nLmFwcAoxNzU4MDY3MTk5CjgzODg2" +
+  "MDcKOA==\n";
       await ScanbotSDK.initialize({
-        licenseKey: "",
+        licenseKey: LICENSE_KEY,
         enginePath: "/wasm/"
       });
     };
@@ -75,9 +122,9 @@ export default function ScanbotBarcodeScannerComponent() {
       ${scanResults.message}
       ${scanResults.product ? '-' : ''}${scanResults.product || ''}
       ${scanResults.type ? '-' : ''}${scanResults.type || ''}
-      ${scanResults.ticketHolder  ? '-' : ''}${scanResults.ticketHolder || ''}`
+      ${scanResults.ticketHolder ? '-' : ''}${scanResults.ticketHolder || ''}`
     })
-   };
+  };
 
 
   const startScanner = async (options = {
@@ -98,6 +145,17 @@ export default function ScanbotBarcodeScannerComponent() {
     const result = await ScanbotSDK.UI.createBarcodeScanner(config);
 
     if (result && result.items.length > 0) {
+      if (result.items[0].barcode.text == previousScanBarcode) {
+        return startScanner({
+          topBarColour: config.topBar.backgroundColor,
+          topBarText: config.topBar.title.text,
+          userGuidanceText: config.userGuidance.title.text
+        })
+      };
+      clearTimeout();
+      setPreviousScanBarcode(result.items[0].barcode.text);
+      resetTimeout();
+
       playScannedSfx();
       setResultsLoading(true);
       setScanResults({
@@ -153,19 +211,7 @@ export default function ScanbotBarcodeScannerComponent() {
             break
         };
       });
-
       return;
-      setTimeout(function () {
-        // playAcceptedSfx();
-        // playRejectedSfx();
-        playAttentionSfx();
-        setResultsLoading(false);
-        startScanner({
-          topBarText: "*** NOT VALID FOR ENTRY***",
-          topBarColour: "#FFFF00",
-          userGuidanceText: "Already scanned 31/12/2025 10:59 At ATR Waterpark Reception. MAP Group Waterpark Takeover 2025 - Complimentary - Gregory Oakley-Stevenson"
-        })
-      }, 2000);
     }
 
     return result;
@@ -175,8 +221,20 @@ export default function ScanbotBarcodeScannerComponent() {
     if (!selectedAccessPoint) {
       return;
     };
-    startScanner();
-  }, [selectedAccessPoint]);
+    if (!accessPoints || !accessPoints.length) {
+      return;
+    };
+
+    const currentAccessPoint = accessPoints.find(f => f.id === selectedAccessPoint);
+    if (!currentAccessPoint) {
+      return setSelectedAccessPoint('');
+    }
+    startScanner({
+      topBarText: currentAccessPoint.name,
+      topBarColour: "#000000",
+      userGuidanceText: "Present ticket"
+    });
+  }, [selectedAccessPoint, accessPoints]);
 
   if (resultsLoading) {
     return <GridLoader />

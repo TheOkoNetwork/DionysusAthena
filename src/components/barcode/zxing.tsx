@@ -2,6 +2,7 @@
 
 
 import { useState, useEffect } from "react";
+import { useLocalStorage } from "@uidotdev/usehooks";
 import { useZxing } from "react-zxing";
 import useSound from 'use-sound';
 import { useMediaDevices } from "react-media-devices";
@@ -27,7 +28,7 @@ export default function ZxingBarcodeScannerComponent() {
   const [scanResults, setScanResults] = useState<ScanResults>({ hasResult: false });
   const [scanAcknowledged, setScanAcknowledged] = useState<boolean>(false);
   const [accessPoints, setAccessPoints] = useState<AccessPoint[]>();
-  const [selectedAccessPoint, setSelectedAccessPoint] = useState<string>();
+  const [selectedAccessPoint, setSelectedAccessPoint] = useLocalStorage<string>('selectedAccessPoint');
 
   const [scannerStatus, setScannerStatus] = useState<string>("Loading");
   const [scanDivClass, setScanDivClass] = useState<string>("");
