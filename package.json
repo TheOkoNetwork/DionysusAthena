@@ -28,7 +28,7 @@
     "@tailwindcss/postcss": "^4.1.12",
     "@uidotdev/usehooks": "^2.4.1",
     "algoliasearch": "^5.35.0",
-    "apexcharts": "^5.3.4",
+    "apexcharts": "^5.3.5",
     "autoprefixer": "^10.4.20",
     "dotenv": "^17.2.1",
     "flatpickr": "^4.6.13",
