@@ -2,29 +2,29 @@
 
 
 import ScanbotSDK from 'scanbot-web-sdk/ui';
-import { useEffect, useState, CSSProperties,useCallback, useRef } from "react";
+import { useEffect, useState, CSSProperties, useCallback, useRef } from "react";
 
-function useTimeout(callback, delay) {
-    const callbackRef = useRef(callback)
-    const timeoutRef = useRef()
-    useEffect(() => {
-        callbackRef.current = callback
-    }, [callback])
-    const set = useCallback(() => {
-        timeoutRef.current = setTimeout(() => callbackRef.current(), delay)
-    }, [delay])
-    const clear = useCallback(() => {
-        timeoutRef.current && clearTimeout(timeoutRef.current)
-    }, [])
-    useEffect(() => {
-        set()
-        return clear
-    }, [delay, set, clear])
-    const reset = useCallback(() => {
-        clear()
-        set()
-    }, [clear, set])
-    return { reset, clear }
+function useTimeout(callback: () => void, delay: number) {
+  const callbackRef = useRef(callback)
+  const timeoutRef = useRef(setTimeout(() => function () { }, 0));
+  useEffect(() => {
+    callbackRef.current = callback
+  }, [callback])
+  const set = useCallback(() => {
+    timeoutRef.current = setTimeout(() => callbackRef.current(), delay)
+  }, [delay])
+  const clear = useCallback(() => {
+    timeoutRef.current && clearTimeout(timeoutRef.current)
+  }, [])
+  useEffect(() => {
+    set()
+    return clear
+  }, [delay, set, clear])
+  const reset = useCallback(() => {
+    clear()
+    set()
+  }, [clear, set])
+  return { reset, clear }
 }
 
 
@@ -66,8 +66,9 @@ export default function ScanbotBarcodeScannerComponent() {
   const [scanAcknowledged, setScanAcknowledged] = useState<boolean>(false);
   const [scanDivClass, setScanDivClass] = useState<string>("");
   const [previousScanBarcode, setPreviousScanBarcode] = useState<string>("");
-  const [previousScanDedupe, setPreviousScanDedupe] = useState();
-
+  const { clear: clearTimeout, reset: resetTimeout } = useTimeout(function () {
+    setPreviousScanBarcode('');
+  }, 1250);
 
   useEffect(() => {
     setResultsLoading(true);
@@ -83,8 +84,25 @@ export default function ScanbotBarcodeScannerComponent() {
       return;
     }
     const init = async () => {
+      const LICENSE_KEY =
+  "lbeKBwflnPu1yqygUOwQlzrYLRPB+D" +
+  "CX3I90LMfzxsHOfHeH9wG0pVEq2mZI" +
+  "It4tHBg2z+Uq6ckEJkll81bLCaM1NN" +
+  "w0/sfKmEOaS7CCPnJ+OEKLo1cjz0AD" +
+  "2jkPwRpKZcTTepwTEXAMDbch2qDK8+" +
+  "QPldoGoGeFQo5ekola5p9o2iwSgahi" +
+  "sS1Kp3rAYMwT0wNvWqURTYCHseNBtH" +
+  "HwLcnYGEj+pt5nCVbX2/5gnC8poseL" +
+  "hUbBk7//PiXEPBmPslnsQbM8uJ6pc1" +
+  "0r7XAu6/fx/q81Vga4hOI7Q5ENg28l" +
+  "AGbeRhjIIwVgPMjtErqO2f2id71Smh" +
+  "dVcBhpgFqEiQ==\nU2NhbmJvdFNESw" +
+  "psb2NhbGhvc3R8bWFwZ3JvdXAuYXRo" +
+  "ZW5hLmdiLmRpb255c3VzdGlja2V0aW" +
+  "5nLmFwcAoxNzU4MDY3MTk5CjgzODg2" +
+  "MDcKOA==\n";
       await ScanbotSDK.initialize({
-        licenseKey: "",
+        licenseKey: LICENSE_KEY,
         enginePath: "/wasm/"
       });
     };
@@ -104,9 +122,9 @@ export default function ScanbotBarcodeScannerComponent() {
       ${scanResults.message}
       ${scanResults.product ? '-' : ''}${scanResults.product || ''}
       ${scanResults.type ? '-' : ''}${scanResults.type || ''}
-      ${scanResults.ticketHolder  ? '-' : ''}${scanResults.ticketHolder || ''}`
+      ${scanResults.ticketHolder ? '-' : ''}${scanResults.ticketHolder || ''}`
     })
-   };
+  };
 
 
   const startScanner = async (options = {
@@ -127,22 +145,16 @@ export default function ScanbotBarcodeScannerComponent() {
     const result = await ScanbotSDK.UI.createBarcodeScanner(config);
 
     if (result && result.items.length > 0) {
-if (result.items[0].barcode.text == previousScanBarcode) {
-  return startScanner({
-    topBarColour: config.topBar.backgroundColor,
-    topBarText: config.topBar.title.text,
-    userGuidanceText: config.userGuidance.title.text
-  })
-};
-if (previousScanDedupe && typeof(previousScanDedupe) == 'function') {
-  previousScanDedupe();
-}
-       const { clearTimeout, resetTimeout } = useTimeout(function() {
-        setPreviousScanBarcode('');
-      }, 1000);
-      setPreviousScanDedupe(clearTimeout);
-setPreviousScanBarcode(result.items[0].barcode.text);
-
+      if (result.items[0].barcode.text == previousScanBarcode) {
+        return startScanner({
+          topBarColour: config.topBar.backgroundColor,
+          topBarText: config.topBar.title.text,
+          userGuidanceText: config.userGuidance.title.text
+        })
+      };
+      clearTimeout();
+      setPreviousScanBarcode(result.items[0].barcode.text);
+      resetTimeout();
 
       playScannedSfx();
       setResultsLoading(true);
@@ -222,7 +234,7 @@ setPreviousScanBarcode(result.items[0].barcode.text);
       topBarColour: "#000000",
       userGuidanceText: "Present ticket"
     });
-  }, [selectedAccessPoint,accessPoints]);
+  }, [selectedAccessPoint, accessPoints]);
 
   if (resultsLoading) {
     return <GridLoader />
