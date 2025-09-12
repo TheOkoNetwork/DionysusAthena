@@ -16,6 +16,7 @@ export async function POST(request: Request,): Promise<Response> {
   const session = await getServerSession(authOptions);
   const { barcode, access_point_id, scanning_engine } = await request.json()
   console.log(`Validating barcode: ${barcode} at access point: ${access_point_id}`)
+
   console.log("Session:", session);
   if (!session?.accessToken) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });

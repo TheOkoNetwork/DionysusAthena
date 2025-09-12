@@ -19,7 +19,8 @@ export default function RootLayout({
     <html lang="en">
       <body className="dark:bg-gray-900">
 
-        {/* <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+        
+{/* <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
       <script>eruda.init();</script> */}
 
         <ConfigLoader />
