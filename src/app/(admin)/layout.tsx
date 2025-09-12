@@ -14,15 +14,15 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-    const { isExpanded, isHovered, isMobileOpen } = useSidebar();
-    const { status: sessionStatus } = useSession();
+   const { isExpanded, isHovered, isMobileOpen } = useSidebar();
+   const { status: sessionStatus } = useSession();
 
-    if (sessionStatus === "loading") {
-      return "Loading session..."
-    }
+   if (sessionStatus === "loading") {
+     return "Loading session..."
+   }
     if (sessionStatus === "unauthenticated") {
-      // If the user is not authenticated, redirect to the sign-in page
-      return redirect('/signin')
+  //     // If the user is not authenticated, redirect to the sign-in page
+     return redirect('/signin')
     }
     // window.alert(JSON.stringify(session));
     // Dynamic class for main content margin based on sidebar state
